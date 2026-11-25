@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#f4efe5">
+  <title>测测你们的恋爱契合度</title>
+  <style>
+    :root {
+      --paper: #f4efe5;
+      --paper-light: #fffdf8;
+      --ink: #1e2523;
+      --ink-soft: #626763;
+      --jade: #275b54;
+      --jade-deep: #153f3a;
+      --jade-pale: #dce7e1;
+      --gold: #b59555;
+      --gold-light: #e5d5ab;
+      --rouge: #a84d4c;
+      --line: rgba(79, 70, 48, .18);
+      --shadow: 0 22px 70px rgba(42, 50, 44, .12);
+      --serif: "Songti SC", "STSong", "Noto Serif CJK SC", "Times New Roman", serif;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--paper); }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      font-family: var(--sans);
+      background:
+        radial-gradient(circle at 12% 8%, rgba(181, 149, 85, .13), transparent 27rem),
+        radial-gradient(circle at 88% 90%, rgba(39, 91, 84, .11), transparent 29rem),
+        linear-gradient(115deg, rgba(255,255,255,.3), transparent 48%),
+        var(--paper);
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .23;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.08'/%3E%3C/svg%3E");
+      mix-blend-mode: multiply;
+      z-index: 10;
+    }
+    button { font: inherit; }
+    button:focus-visible { outline: 3px solid rgba(39, 91, 84, .28); outline-offset: 3px; }
+    .app {
+      position: relative;
+      z-index: 1;
+      width: min(100% - 28px, 820px);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: clamp(20px, 5vw, 54px) 0;
+      display: grid;
+      place-items: center;
+    }
+    .view { display: none; width: 100%; }
+    .view.active { display: block; animation: enter .72s cubic-bezier(.2,.75,.25,1) both; }
+    @keyframes enter { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+    .shell {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(28px, 7vw, 64px);
+      border: 1px solid rgba(181,149,85,.42);
+      border-radius: 26px;
+      background: rgba(255, 253, 248, .8);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+    .shell::before, .shell::after {
+      content: "";
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border: 1px solid rgba(181,149,85,.32);
+      transform: rotate(45deg);
+      pointer-events: none;
+    }
+    .shell::before { top: -83px; left: -83px; }
+    .shell::after { right: -83px; bottom: -83px; }
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 24px;
+      color: var(--jade);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 34px; height: 1px; background: var(--gold); }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      max-width: 620px;
+      margin-bottom: 18px;
+      font: 500 clamp(39px, 8.5vw, 68px)/1.13 var(--serif);
+      letter-spacing: -.045em;
+    }
+    .title-mark { color: var(--rouge); position: relative; white-space: nowrap; }
+    .title-mark::after {
+      content: "";
+      position: absolute;
+      left: 4%; right: 1%; bottom: -4px;
+      height: 7px;
+      border-top: 1px solid var(--gold);
+      border-radius: 50%;
+      transform: rotate(-1deg);
+    }
+    .lead { max-width: 560px; margin-bottom: 30px; color: var(--ink-soft); font-size: 16px; line-height: 1.9; }
+    .facts { display: flex; flex-wrap: wrap; gap: 9px; margin: 0 0 34px; padding: 0; list-style: none; }
+    .facts li { padding: 8px 12px; border: 1px solid var(--line); border-radius: 99px; color: var(--jade-deep); font-size: 12px; background: rgba(255,255,255,.45); }
+    .primary-btn, .secondary-btn {
+      border: 0;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+    .primary-btn {
+      min-width: 190px;
+      padding: 15px 24px;
+      color: #fffdf8;
+      background: var(--jade-deep);
+      box-shadow: 0 10px 28px rgba(21,63,58,.22);
+    }
+    .primary-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(21,63,58,.28); background: #0f3531; }
+    .primary-btn .arrow { display: inline-block; margin-left: 10px; transition: transform .2s ease; }
+    .primary-btn:hover .arrow { transform: translateX(4px); }
+    .disclaimer { margin: 22px 0 0; color: #85877f; font-size: 11px; line-height: 1.6; }
+    .seal {
+      position: absolute;
+      right: clamp(28px, 8vw, 74px);
+      top: clamp(26px, 7vw, 58px);
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--rouge);
+      color: var(--rouge);
+      font: 600 12px/1.15 var(--serif);
+      letter-spacing: .12em;
+      transform: rotate(5deg);
+      opacity: .82;
+    }
+
+    .quiz-shell { padding: clamp(24px, 6vw, 48px); }
+    .quiz-head { margin-bottom: clamp(28px, 6vw, 48px); }
+    .quiz-meta { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 13px; }
+    .question-count { color: var(--jade); font: 600 13px/1 var(--sans); letter-spacing: .15em; }
+    .question-count strong { font: 500 28px/1 var(--serif); letter-spacing: 0; }
+    .progress-label { color: var(--ink-soft); font-size: 11px; }
+    .progress-track { height: 4px; overflow: hidden; border-radius: 99px; background: #dedbd1; }
+    .progress-bar { width: 2.5%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--jade), var(--gold)); transition: width .45s cubic-bezier(.2,.8,.2,1); }
+    .question-panel { min-height: 430px; }
+    .question-panel.out { animation: questionOut .22s ease both; }
+    .question-panel.in { animation: questionIn .42s cubic-bezier(.2,.75,.25,1) both; }
+    @keyframes questionOut { to { opacity: 0; transform: translateX(-20px); } }
+    @keyframes questionIn { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+    .scene-tag { display: inline-flex; align-items: center; gap: 7px; margin-bottom: 15px; color: var(--rouge); font-size: 11px; letter-spacing: .12em; }
+    .scene-tag::before { content: "◆"; color: var(--gold); font-size: 8px; }
+    .question-title { margin-bottom: 28px; font: 500 clamp(23px, 5vw, 31px)/1.48 var(--serif); letter-spacing: -.02em; }
+    .options { display: grid; gap: 12px; }
+    .option {
+      width: 100%;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-align: left;
+      color: var(--ink);
+      background: rgba(255,255,255,.58);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: border-color .2s ease, transform .2s ease, background .2s ease, box-shadow .2s ease;
+    }
+    .option:hover { transform: translateX(4px); border-color: rgba(39,91,84,.54); background: rgba(255,255,255,.9); box-shadow: 0 8px 25px rgba(39,48,42,.07); }
+    .option.selected { color: var(--jade-deep); border-color: var(--jade); background: var(--jade-pale); transform: scale(.99); }
+    .option-key { flex: 0 0 27px; height: 27px; display: grid; place-items: center; border: 1px solid var(--gold-light); border-radius: 50%; color: var(--gold); font: 500 12px/1 var(--serif); }
+    .option-text { line-height: 1.55; font-size: 14px; }
+
+    .result-wrap { width: 100%; }
+    .result-card {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(181,149,85,.56);
+      border-radius: 22px;
+      background: var(--paper-light);
+      box-shadow: var(--shadow);
+    }
+    .result-card::before { content: ""; position: absolute; inset: 9px; border: 1px solid rgba(181,149,85,.2); border-radius: 15px; pointer-events: none; }
+    .poster-head {
+      position: relative;
+      padding: clamp(30px, 7vw, 58px) clamp(25px, 7vw, 58px) 34px;
+      text-align: center;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(181,149,85,.15), transparent 48%),
+        linear-gradient(180deg, rgba(220,231,225,.55), transparent);
+    }
+    .poster-kicker { margin: 0 0 22px; color: var(--jade); font-size: 10px; font-weight: 700; letter-spacing: .3em; }
+    .score-ring {
+      --score: 0;
+      width: 150px;
+      height: 150px;
+      margin: 0 auto 24px;
+      position: relative;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: conic-gradient(var(--jade) calc(var(--score) * 1%), var(--gold-light) 0);
+      box-shadow: inset 0 0 0 1px rgba(181,149,85,.25), 0 12px 35px rgba(39,91,84,.12);
+    }
+    .score-ring::before { content: ""; position: absolute; inset: 9px; border-radius: 50%; background: var(--paper-light); border: 1px solid rgba(181,149,85,.32); }
+    .score-inner { position: relative; z-index: 1; }
+    .score-number { display: block; color: var(--jade-deep); font: 500 52px/.9 var(--serif); letter-spacing: -.05em; }
+    .score-unit { color: var(--ink-soft); font-size: 10px; letter-spacing: .18em; }
+    .result-type { margin: 0 0 12px; font: 500 clamp(30px, 7vw, 46px)/1.2 var(--serif); letter-spacing: -.03em; }
+    .result-quote { max-width: 520px; margin: 0 auto; color: var(--rouge); font: 500 15px/1.8 var(--serif); }
+    .poster-body { position: relative; padding: 8px clamp(25px, 7vw, 58px) clamp(32px, 7vw, 58px); }
+    .gold-divider { display: flex; align-items: center; gap: 12px; margin: 13px 0 30px; color: var(--gold); }
+    .gold-divider::before, .gold-divider::after { content: ""; height: 1px; flex: 1; background: linear-gradient(90deg, transparent, var(--gold-light)); }
+    .gold-divider::after { transform: scaleX(-1); }
+    .narrative-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 34px; }
+    .narrative { padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: rgba(244,239,229,.45); }
+    .narrative h3 { margin-bottom: 8px; color: var(--jade); font-size: 11px; letter-spacing: .14em; }
+    .narrative p { margin: 0; color: #535a56; font-size: 13px; line-height: 1.75; }
+    .dimension-title { display: flex; align-items: end; justify-content: space-between; margin-bottom: 19px; }
+    .dimension-title h3 { margin: 0; font: 500 20px/1 var(--serif); }
+    .dimension-title span { color: var(--ink-soft); font-size: 10px; }
+    .dimension-list { display: grid; gap: 13px; }
+    .dimension-row { display: grid; grid-template-columns: 62px 1fr 31px; align-items: center; gap: 10px; }
+    .dimension-name { color: #4e5551; font-size: 12px; }
+    .dimension-track { height: 7px; overflow: hidden; border-radius: 99px; background: #e6e2d9; }
+    .dimension-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--jade), #568b7d 72%, var(--gold)); transition: width .9s cubic-bezier(.2,.75,.25,1); }
+    .dimension-value { color: var(--jade-deep); font: 500 12px/1 var(--serif); text-align: right; }
+    .egg { margin: 28px 0 0; padding: 16px 18px; border-left: 2px solid var(--rouge); color: #62635d; background: rgba(168,77,76,.055); font-size: 12px; line-height: 1.75; }
+    .egg strong { color: var(--rouge); }
+    .actions { display: flex; justify-content: center; gap: 11px; flex-wrap: wrap; margin-top: 20px; }
+    .secondary-btn { padding: 13px 21px; color: var(--jade-deep); background: rgba(255,253,248,.65); border: 1px solid rgba(39,91,84,.34); }
+    .secondary-btn:hover { transform: translateY(-2px); background: #fff; }
+    .toast {
+      position: fixed;
+      left: 50%; bottom: max(24px, env(safe-area-inset-bottom));
+      z-index: 20;
+      padding: 11px 17px;
+      color: #fff;
+      background: rgba(21,63,58,.94);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 999px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.16);
+      font-size: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 12px);
+      transition: .25s ease;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (max-width: 620px) {
+      .app { width: min(100% - 20px, 820px); padding: 10px 0 24px; place-items: start center; }
+      .shell, .result-card { border-radius: 20px; }
+      .home-shell { min-height: calc(100vh - 34px); display: flex; flex-direction: column; justify-content: center; }
+      .seal { right: 24px; top: 24px; width: 42px; height: 42px; font-size: 10px; }
+      .eyebrow { margin-bottom: 32px; }
+      h1 { padding-right: 16px; }
+      .quiz-shell { min-height: calc(100vh - 34px); }
+      .question-panel { min-height: 0; }
+      .option { padding: 14px; }
+      .narrative-grid { grid-template-columns: 1fr; gap: 10px; }
+      .score-ring { width: 136px; height: 136px; }
+      .actions { position: sticky; bottom: 8px; padding: 8px; border-radius: 999px; background: rgba(244,239,229,.82); backdrop-filter: blur(12px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+    }
+  </style>
+  <style id="arcane-theme">
+    :root {
+      --void-0: #07050f;
+      --void-1: #0d0820;
+      --void-2: #17102f;
+      --violet: #8b5cf6;
+      --violet-bright: #a78bfa;
+      --cyan: #22d3ee;
+      --gold: #fbbf24;
+      --moon: #c4b5fd;
+      --fire: #fb7185;
+      --mist: #67e8f9;
+      --mirror: #93c5fd;
+      --vine: #6ee7b7;
+      --arcane-text: #f5f3ff;
+      --arcane-muted: #a9a3bd;
+      --glass: rgba(24, 16, 52, .68);
+      --glass-strong: rgba(17, 11, 37, .88);
+      --arcane-line: rgba(196, 181, 253, .18);
+      --radius-card: 24px;
+      --radius-control: 15px;
+      --ease-ritual: cubic-bezier(.2,.75,.25,1);
+      --fast: .24s;
+      --normal: .36s;
+      --glow-violet: 0 0 34px rgba(139,92,246,.28);
+      --shadow-void: 0 32px 90px rgba(0,0,0,.44);
+    }
+    html { background: var(--void-0); }
+    body {
+      color: var(--arcane-text);
+      background:
+        radial-gradient(circle at 18% 14%, rgba(139,92,246,.18), transparent 30rem),
+        radial-gradient(circle at 82% 78%, rgba(34,211,238,.10), transparent 28rem),
+        linear-gradient(145deg, var(--void-0), var(--void-1) 46%, #100827 100%);
+      background-attachment: fixed;
+    }
+    body::before {
+      opacity: .14;
+      mix-blend-mode: screen;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.12'/%3E%3C/svg%3E");
+    }
+    .cosmic-dust { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+    .dust {
+      position: absolute;
+      width: var(--size); height: var(--size);
+      left: var(--x); top: var(--y);
+      border-radius: 50%;
+      background: var(--tone);
+      opacity: var(--alpha);
+      box-shadow: 0 0 12px var(--tone);
+      animation: dustDrift var(--duration) ease-in-out var(--delay) infinite alternate;
+    }
+    @keyframes dustDrift { to { transform: translate3d(var(--dx), -24px, 0) scale(1.45); opacity: calc(var(--alpha) * .55); } }
+    .app { z-index: 2; width: min(100% - 24px, 860px); padding: clamp(18px,4vw,46px) 0; }
+    .shell {
+      border-color: var(--arcane-line);
+      border-radius: var(--radius-card);
+      background: linear-gradient(145deg, rgba(34,24,67,.78), rgba(12,8,28,.72));
+      box-shadow: var(--shadow-void), inset 0 1px 0 rgba(255,255,255,.07), var(--glow-violet);
+      backdrop-filter: blur(24px) saturate(125%);
+    }
+    .shell::before, .shell::after { border-color: rgba(34,211,238,.18); }
+    .home-shell { isolation: isolate; }
+    .home-shell::after {
+      width: 320px; height: 320px; right: -180px; bottom: -180px;
+      border-radius: 50%; transform: none;
+      border: 1px solid rgba(139,92,246,.35);
+      box-shadow: 0 0 70px rgba(139,92,246,.15), inset 0 0 50px rgba(34,211,238,.07);
+    }
+    .eyebrow { color: var(--cyan); }
+    .eyebrow::before { background: linear-gradient(90deg, var(--violet), var(--cyan)); box-shadow: 0 0 10px var(--cyan); }
+    h1 { text-shadow: 0 0 42px rgba(139,92,246,.24); }
+    .title-mark { color: var(--moon); }
+    .title-mark::after { border-color: var(--cyan); filter: drop-shadow(0 0 6px rgba(34,211,238,.7)); }
+    .lead, .disclaimer { color: var(--arcane-muted); }
+    .facts li { color: #d8d2eb; background: rgba(139,92,246,.08); border-color: rgba(167,139,250,.2); }
+    .seal { color: var(--gold); border-color: rgba(251,191,36,.7); box-shadow: 0 0 18px rgba(251,191,36,.18); }
+    .primary-btn {
+      color: #fff;
+      background: linear-gradient(135deg, #6d3fe0, var(--violet));
+      border: 1px solid rgba(196,181,253,.36);
+      box-shadow: 0 12px 34px rgba(91,48,185,.38), inset 0 1px 0 rgba(255,255,255,.18);
+    }
+    .primary-btn:hover { background: linear-gradient(135deg, #7c4ee9, #9d73fa); box-shadow: 0 14px 40px rgba(139,92,246,.45), 0 0 26px rgba(34,211,238,.13); }
+    .secondary-btn { color: #ded8f4; background: rgba(139,92,246,.08); border-color: rgba(167,139,250,.32); }
+    .secondary-btn:hover { color: white; background: rgba(139,92,246,.17); }
+
+    /* QuizShell / ProgressConstellation */
+    .quiz-shell { min-height: min(740px, calc(100vh - 50px)); display: grid; grid-template-columns: 116px 1fr; gap: clamp(24px,5vw,54px); align-items: center; overflow: visible; }
+    .quiz-head { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+    .quiz-meta { display: block; margin: 0; text-align: center; }
+    .progress-label { display: block; max-width: 104px; margin-top: 9px; color: var(--arcane-muted); line-height: 1.5; letter-spacing: .04em; }
+    .question-count { display: none; }
+    .rune-progress { position: relative; width: 104px; height: 104px; display: grid; place-items: center; }
+    .rune-progress::before, .rune-progress::after { content:""; position:absolute; border-radius:50%; border:1px solid rgba(139,92,246,.22); animation: runeTurn 16s linear infinite; }
+    .rune-progress::before { inset: 0; border-style: dashed; }
+    .rune-progress::after { inset: 8px; border-color: rgba(34,211,238,.15); animation-direction: reverse; animation-duration: 22s; }
+    @keyframes runeTurn { to { transform: rotate(360deg); } }
+    .rune-svg { position:absolute; inset:0; width:100%; height:100%; transform: rotate(-90deg); overflow: visible; }
+    .rune-base, .rune-lit { fill:none; stroke-width:3; stroke-linecap:round; stroke-dasharray:1.2 1.3; }
+    .rune-base { stroke: rgba(196,181,253,.13); }
+    .rune-lit { stroke: url(#progressGlow); transition: stroke-dashoffset var(--normal) var(--ease-ritual); filter: drop-shadow(0 0 5px rgba(34,211,238,.8)); }
+    .rune-center { position:relative; z-index:2; text-align:center; }
+    .rune-current { display:block; font: 500 28px/1 var(--serif); color:#fff; }
+    .rune-total { color:var(--arcane-muted); font-size:9px; letter-spacing:.12em; }
+    .rune-orbit { position:absolute; inset:0; }
+    .rune-dot { position:absolute; left:50%; top:50%; width:5px; height:5px; margin:-2.5px; border-radius:50%; background:#31264c; border:1px solid rgba(196,181,253,.3); transform: rotate(var(--angle)) translateY(-50px); transition: background .3s, box-shadow .3s; }
+    .rune-dot.lit { background:var(--cyan); box-shadow:0 0 10px var(--cyan); }
+    .progress-track { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+    .question-panel { min-height: 0; }
+    .question-panel::before { content:""; display:block; width:42px; height:1px; margin-bottom:22px; background:linear-gradient(90deg,var(--violet),var(--cyan),transparent); box-shadow:0 0 12px rgba(34,211,238,.42); }
+    .scene-tag { color:var(--cyan); }
+    .scene-tag::before { color:var(--gold); filter:drop-shadow(0 0 5px rgba(251,191,36,.7)); }
+    .question-title { color:#fbfaff; text-shadow:0 0 24px rgba(139,92,246,.14); }
+    .options { gap:11px; }
+    .option {
+      position:relative; overflow:hidden;
+      color:#e8e4f2;
+      background:linear-gradient(115deg, rgba(255,255,255,.045), rgba(139,92,246,.035));
+      border-color:rgba(196,181,253,.16);
+      border-radius:var(--radius-control);
+      transform:translateZ(0);
+    }
+    .option::before { content:""; position:absolute; inset:-70%; border-radius:50%; background:radial-gradient(circle, var(--element-glow, rgba(139,92,246,.45)), transparent 58%); opacity:0; transform:scale(.15); pointer-events:none; }
+    .option::after { content:attr(data-glyph); margin-left:auto; color:var(--element-color,var(--violet-bright)); opacity:.62; font-size:17px; filter:drop-shadow(0 0 7px currentColor); }
+    .option:hover { color:white; border-color:var(--element-color,var(--violet)); background:rgba(139,92,246,.09); box-shadow:0 10px 34px rgba(0,0,0,.18), 0 0 18px var(--element-glow,rgba(139,92,246,.16)); }
+    .option.selected { color:#fff; border-color:var(--element-color,var(--violet)); background:rgba(139,92,246,.12); box-shadow:0 0 0 1px var(--element-color,var(--violet)), 0 0 32px var(--element-glow,rgba(139,92,246,.32)), inset 0 0 28px var(--element-glow,rgba(139,92,246,.12)); }
+    .option.selected::before { animation:elementRipple .58s ease-out both; }
+    @keyframes elementRipple { 0%{opacity:.8;transform:scale(.08)} 100%{opacity:0;transform:scale(1)} }
+    .option-key { color:var(--element-color,var(--violet-bright)); border-color:color-mix(in srgb, var(--element-color,var(--violet)) 55%, transparent); background:rgba(255,255,255,.025); }
+    .question-panel.out { animation:arcaneOut .22s ease both; }
+    .question-panel.in { animation:arcaneIn .36s var(--ease-ritual) both; }
+    @keyframes arcaneOut { to { opacity:0; transform:translate3d(-14px,-7px,0); filter:blur(3px); } }
+    @keyframes arcaneIn { from { opacity:0; transform:translate3d(18px,12px,0); filter:blur(4px); } to { opacity:1; transform:none; filter:none; } }
+    .light-sweep { position:absolute; z-index:5; inset:0; pointer-events:none; overflow:hidden; border-radius:inherit; }
+    .light-sweep::after { content:""; position:absolute; top:-30%; bottom:-30%; width:38%; left:-55%; transform:skewX(-18deg); background:linear-gradient(90deg,transparent,rgba(34,211,238,.14),rgba(167,139,250,.22),transparent); animation:sweep .42s ease-out both; }
+    @keyframes sweep { to { left:125%; } }
+
+    /* ResultSummon / PersonaCard */
+    #resultView { padding: 10px 0 28px; }
+    .summon-stage { min-height:72vh; display:grid; place-items:center; text-align:center; }
+    .summon-core { position:relative; width:260px; height:260px; display:grid; place-items:center; }
+    .summon-circle, .summon-circle::before, .summon-circle::after { position:absolute; border-radius:50%; border:1px solid rgba(167,139,250,.45); box-shadow:0 0 28px rgba(139,92,246,.18), inset 0 0 24px rgba(34,211,238,.07); }
+    .summon-circle { inset:0; animation:summonSpin 2.4s linear infinite; }
+    .summon-circle::before { content:""; inset:24px; border-style:dashed; border-color:rgba(34,211,238,.48); animation:summonSpin 1.8s linear infinite reverse; }
+    .summon-circle::after { content:""; inset:54px; border-color:rgba(251,191,36,.42); }
+    .summon-star { position:relative; z-index:2; color:#fff; font-size:52px; filter:drop-shadow(0 0 18px var(--violet)); animation:summonPulse .8s ease-in-out infinite alternate; }
+    .summon-copy { position:absolute; top:calc(100% + 22px); width:320px; color:var(--moon); font:500 14px/1.5 var(--serif); letter-spacing:.18em; }
+    @keyframes summonSpin { to{transform:rotate(360deg)} }
+    @keyframes summonPulse { to{transform:scale(1.13);filter:drop-shadow(0 0 28px var(--cyan))} }
+    .result-wrap { opacity:1; }
+    .result-wrap[hidden], .summon-stage[hidden] { display:none !important; }
+    .result-reveal { animation:cardReveal .66s var(--ease-ritual) both; }
+    @keyframes cardReveal { from{opacity:0;transform:perspective(1000px) rotateY(9deg) translateY(20px);filter:blur(8px)} to{opacity:1;transform:none;filter:none} }
+    .persona-card {
+      --persona-accent: var(--violet);
+      position:relative; overflow:hidden; width:min(100%,680px); margin:0 auto;
+      border:1px solid color-mix(in srgb,var(--persona-accent) 48%,transparent);
+      border-radius:28px;
+      background:linear-gradient(160deg,rgba(29,19,58,.98),rgba(7,5,16,.99));
+      box-shadow:var(--shadow-void),0 0 56px color-mix(in srgb,var(--persona-accent) 22%,transparent);
+    }
+    .persona-card::before { content:""; position:absolute; inset:10px; z-index:5; pointer-events:none; border:1px solid rgba(255,255,255,.08); border-radius:20px; }
+    .persona-art { position:relative; height:clamp(390px,65vw,520px); overflow:hidden; background:var(--persona-bg); }
+    .persona-art::before { content:""; position:absolute; inset:0; background:radial-gradient(circle at 50% 40%, color-mix(in srgb,var(--persona-accent) 28%,transparent),transparent 40%),linear-gradient(180deg,transparent 55%,rgba(7,5,16,.98)); z-index:2; }
+    .persona-art::after { content:""; position:absolute; width:420px;height:420px;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;border:1px solid color-mix(in srgb,var(--persona-accent) 30%,transparent);box-shadow:0 0 60px color-mix(in srgb,var(--persona-accent) 12%,transparent),inset 0 0 60px color-mix(in srgb,var(--persona-accent) 8%,transparent); }
+    .portrait-svg { position:absolute; z-index:1; inset:0; width:100%; height:100%; filter:drop-shadow(0 18px 24px rgba(0,0,0,.5)); }
+    .card-topline { position:absolute; z-index:4; top:28px; left:30px; right:30px; display:flex; justify-content:space-between; align-items:center; color:rgba(255,255,255,.62); font-size:9px; letter-spacing:.2em; }
+    .card-index { color:var(--gold); }
+    .persona-heading { position:absolute; z-index:4; left:clamp(24px,7vw,48px); right:clamp(24px,7vw,48px); bottom:28px; }
+    .element-chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+    .element-chip { display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid color-mix(in srgb,var(--chip) 48%,transparent);border-radius:99px;color:#fff;background:color-mix(in srgb,var(--chip) 13%,transparent);font-size:10px;letter-spacing:.12em;backdrop-filter:blur(8px); }
+    .persona-title { margin:0;color:#fff;font:500 clamp(36px,8vw,58px)/1.06 var(--serif);letter-spacing:-.04em;text-shadow:0 0 28px color-mix(in srgb,var(--persona-accent) 44%,transparent); }
+    .persona-subtitle { margin:9px 0 0;color:#c7c1d6;font-size:11px;letter-spacing:.2em;text-transform:uppercase; }
+    .persona-content { position:relative;z-index:3;padding:8px clamp(24px,7vw,48px) clamp(32px,7vw,46px); }
+    .score-badge { position:absolute;top:12px;right:clamp(24px,7vw,48px);width:68px;height:68px;display:grid;place-items:center;border-radius:50%;border:1px solid color-mix(in srgb,var(--persona-accent) 42%,transparent);background:rgba(10,7,23,.78);box-shadow:0 0 22px color-mix(in srgb,var(--persona-accent) 20%,transparent);text-align:center; }
+    .score-badge strong { display:block;font:500 25px/1 var(--serif); }
+    .score-badge span { color:var(--arcane-muted);font-size:8px;letter-spacing:.08em; }
+    .verdict { margin:0 90px 27px 0;padding:0;list-style:none;display:grid;gap:9px; }
+    .verdict li { position:relative;padding-left:17px;color:#d8d3e5;font:500 14px/1.7 var(--serif); }
+    .verdict li::before { content:"✦";position:absolute;left:0;color:var(--persona-accent);font-size:9px;filter:drop-shadow(0 0 5px currentColor); }
+    .persona-grid { display:grid;grid-template-columns:minmax(0,1.05fr) minmax(210px,.95fr);gap:24px;padding-top:24px;border-top:1px solid rgba(255,255,255,.09); }
+    .stats-panel h3,.archetype-note h3 { margin:0 0 12px;color:var(--cyan);font-size:10px;letter-spacing:.18em; }
+    .radar-wrap { position:relative;aspect-ratio:1;max-width:260px;margin:0 auto; }
+    .radar-svg { width:100%;height:100%;overflow:visible; }
+    .radar-grid { fill:none;stroke:rgba(196,181,253,.15);stroke-width:1; }
+    .radar-axis { stroke:rgba(196,181,253,.12);stroke-width:1; }
+    .radar-shape { fill:color-mix(in srgb,var(--persona-accent) 24%,transparent);stroke:var(--persona-accent);stroke-width:2;filter:drop-shadow(0 0 6px color-mix(in srgb,var(--persona-accent) 55%,transparent));transition:points .6s; }
+    .radar-label { fill:#bdb7cc;font:10px var(--sans); }
+    .archetype-note { align-self:center; }
+    .reference-type { margin:0 0 15px;color:#fff;font:500 21px/1.45 var(--serif); }
+    .trait-list { display:flex;flex-wrap:wrap;gap:7px;margin-bottom:17px; }
+    .trait { padding:6px 9px;border-radius:7px;background:rgba(255,255,255,.055);color:#c7c1d4;font-size:10px; }
+    .relation-echo { margin:0;color:var(--arcane-muted);font-size:11px;line-height:1.7; }
+    .relation-echo strong { color:var(--gold);font-weight:500; }
+    .persona-footer { display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:24px;padding-top:17px;border-top:1px solid rgba(255,255,255,.07);color:#716b83;font-size:8px;letter-spacing:.12em; }
+    .actions { margin-top:18px; }
+    .save-btn::before { content:"↓";margin-right:8px; }
+    .toast { background:rgba(20,13,44,.95);border-color:rgba(167,139,250,.28); }
+
+    @media (max-width:700px) {
+      .app { width:min(100% - 16px,860px);padding:8px 0 24px; }
+      .shell { border-radius:20px; }
+      .home-shell { min-height:calc(100svh - 24px); }
+      .quiz-shell { min-height:calc(100svh - 16px);grid-template-columns:1fr;grid-template-rows:auto 1fr;gap:20px;padding:22px 18px 28px;align-items:start; }
+      .quiz-head { flex-direction:row;justify-content:space-between;align-items:center; }
+      .rune-progress { width:82px;height:82px; }
+      .rune-progress::after { inset:7px; }
+      .rune-dot { transform:rotate(var(--angle)) translateY(-39px); }
+      .rune-current { font-size:23px; }
+      .progress-label { max-width:160px;margin:0;text-align:right;font-size:10px; }
+      .question-panel::before { margin-bottom:16px; }
+      .question-title { margin-bottom:22px;font-size:clamp(21px,6vw,27px); }
+      .option { padding:13px 14px;gap:11px; }
+      .option-text { font-size:13px; }
+      .persona-card { border-radius:20px; }
+      .persona-art { height:410px; }
+      .persona-heading { bottom:22px; }
+      .persona-content { padding-top:14px; }
+      .persona-grid { grid-template-columns:1fr;gap:20px; }
+      .radar-wrap { max-width:240px; }
+      .actions { position:sticky;bottom:8px;z-index:12;padding:7px;border:1px solid rgba(167,139,250,.16);background:rgba(9,6,20,.82);backdrop-filter:blur(16px); }
+      .actions button { flex:1;min-width:0;padding:12px 10px;font-size:12px; }
+    }
+    @media (max-width:390px) {
+      h1 { font-size:37px; }
+      .quiz-shell { padding-inline:14px; }
+      .persona-art { height:380px; }
+      .persona-title { font-size:36px; }
+      .verdict { margin-right:72px; }
+      .score-badge { width:60px;height:60px;right:20px; }
+      .score-badge strong { font-size:22px; }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      .cosmic-dust { display:none; }
+      .rune-progress::before,.rune-progress::after,.summon-circle,.summon-circle::before,.summon-star { animation:none !important; }
+      .question-panel.out { opacity:0;transform:none;filter:none; }
+      .question-panel.in,.result-reveal { animation:reducedFade .12s ease both !important; }
+      @keyframes reducedFade { from{opacity:0}to{opacity:1} }
+    }
+  </style>
+</head>
+<body>
+  <div id="cosmicDust" class="cosmic-dust" aria-hidden="true"></div>
+  <main class="app">
+    <section id="homeView" class="view active" aria-labelledby="mainTitle">
+      <div class="shell home-shell">
+        <div class="seal" aria-hidden="true">缘起<br>此刻</div>
+        <p class="eyebrow">ARCANE RELATIONSHIP ORACLE</p>
+        <h1 id="mainTitle">测测你们的<br><span class="title-mark">恋爱契合度</span></h1>
+        <p class="lead">不考“标准答案”，只看你们如何一起吃饭、吵架、旅行和消磨漫长日常。请以这段关系的整体状态作答，看看两个人写出了怎样的相处纹理。</p>
+        <ul class="facts" aria-label="测试信息">
+          <li>40 个日常切片</li><li>8 维关系画像</li><li>约 5 分钟</li><li>单人即可完成</li>
+        </ul>
+        <button id="startBtn" class="primary-btn" type="button">开启共鸣仪式 <span class="arrow">→</span></button>
+        <p class="disclaimer">趣味测试，仅供娱乐，不构成专业心理诊断。</p>
+      </div>
+    </section>
+
+    <section id="quizView" class="view" aria-labelledby="questionTitle">
+      <div class="shell quiz-shell">
+        <div class="quiz-head">
+          <div class="quiz-meta">
+            <div class="question-count"><strong id="currentNumber">01</strong> / 40</div>
+            <div class="rune-progress" role="progressbar" aria-label="共鸣仪式进度" aria-valuemin="0" aria-valuemax="40" aria-valuenow="1">
+              <svg class="rune-svg" viewBox="0 0 104 104" aria-hidden="true">
+                <defs><linearGradient id="progressGlow"><stop stop-color="#8b5cf6"/><stop offset=".58" stop-color="#22d3ee"/><stop offset="1" stop-color="#fbbf24"/></linearGradient></defs>
+                <circle class="rune-base" cx="52" cy="52" r="45" pathLength="100"/>
+                <circle id="runeLit" class="rune-lit" cx="52" cy="52" r="45" pathLength="100"/>
+              </svg>
+              <div id="runeOrbit" class="rune-orbit" aria-hidden="true"></div>
+              <div class="rune-center"><strong id="runeCurrent" class="rune-current">01</strong><span class="rune-total">/ 40</span></div>
+            </div>
+            <span id="progressLabel" class="progress-label">正在校准 · 约会日常</span>
+          </div>
+          <div class="progress-track" role="progressbar" aria-label="答题进度" aria-valuemin="0" aria-valuemax="40" aria-valuenow="1">
+            <div id="progressBar" class="progress-bar"></div>
+          </div>
+        </div>
+        <div id="questionPanel" class="question-panel">
+          <span id="sceneTag" class="scene-tag"></span>
+          <h2 id="questionTitle" class="question-title"></h2>
+          <div id="options" class="options" role="radiogroup" aria-labelledby="questionTitle"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="resultView" class="view" aria-labelledby="personaTitle">
+      <div id="summonStage" class="summon-stage" aria-live="polite">
+        <div class="summon-core"><div class="summon-circle"></div><span class="summon-star">✦</span><p class="summon-copy">共鸣汇聚中 · 正在显现人物原型</p></div>
+      </div>
+      <div id="resultWrap" class="result-wrap" hidden>
+        <article class="persona-card" id="personaCard">
+          <div id="personaArt" class="persona-art">
+            <div class="card-topline"><span>ARCANE RELATION ARCHIVE</span><span id="cardIndex" class="card-index">NO. 01</span></div>
+            <div id="portraitMount"></div>
+            <header class="persona-heading">
+              <div id="elementChips" class="element-chips"></div>
+              <h2 id="personaTitle" class="persona-title"></h2>
+              <p id="personaSubtitle" class="persona-subtitle"></p>
+            </header>
+          </div>
+          <div class="persona-content">
+            <div class="score-badge"><div><strong id="scoreNumber">0</strong><span>契合度</span></div></div>
+            <ul id="verdictList" class="verdict"></ul>
+            <div class="persona-grid">
+              <section class="stats-panel"><h3>共鸣属性 · RESONANCE STATS</h3><div id="radarMount" class="radar-wrap"></div></section>
+              <section class="archetype-note"><h3>气质参照 · ARCHETYPE</h3><p id="referenceType" class="reference-type"></p><div id="traitList" class="trait-list"></div><p id="relationEcho" class="relation-echo"></p></section>
+            </div>
+            <footer class="persona-footer"><span>原创人物原型 · 非专业心理诊断</span><span id="cardCode">RESONANCE / 000</span></footer>
+          </div>
+        </article>
+        <div class="actions">
+          <button id="restartBtn" class="secondary-btn" type="button">重新测试</button>
+          <button id="copyBtn" class="secondary-btn" type="button">复制判词</button>
+          <button id="saveBtn" class="primary-btn save-btn" type="button">保存人物卡</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const DIMENSIONS = ['默契度', '沟通力', '包容度', '浪漫度', '稳定度', '冒险度', '独立度', '成长度'];
+      const W = {
+        sync:       [3,2,2,2,3,1,1,2],
+        talk:       [2,3,2,1,2,1,2,3],
+        soft:       [2,2,3,2,3,0,1,2],
+        spark:      [2,1,1,3,1,3,1,2],
+        steady:     [2,2,3,1,3,0,2,2],
+        roam:       [1,1,1,2,1,3,2,2],
+        free:       [1,2,1,1,2,1,3,3],
+        grow:       [1,3,2,1,2,2,2,3],
+        ritual:     [2,1,2,3,3,0,1,1],
+        repair:     [2,3,3,1,3,0,1,3],
+        playful:    [3,1,2,3,1,3,1,1],
+        pragmatic:  [2,2,2,0,3,1,2,2],
+        together:   [3,2,2,2,2,1,0,1],
+        parallel:   [1,2,2,1,2,1,3,2],
+        intense:    [2,0,1,3,0,3,0,1],
+        guarded:    [0,1,1,0,2,0,3,1],
+        avoid:      [1,0,1,1,1,1,2,0],
+        negotiate:  [2,3,3,1,3,1,2,3],
+        cozy:       [3,2,3,2,3,0,1,1],
+        curious:    [2,2,1,2,1,3,2,3],
+        loyal:      [2,2,3,2,3,0,1,2],
+        bold:       [1,1,1,3,0,3,2,2],
+        balanced:   [2,3,2,2,2,2,2,2],
+        lowkey:     [2,1,2,0,3,0,3,1]
+      };
+      const ELEMENT_META = {
+        star:   { name:'星', glyph:'✦', color:'#fbbf24', glow:'rgba(251,191,36,.28)' },
+        moon:   { name:'月', glyph:'☾', color:'#c4b5fd', glow:'rgba(196,181,253,.30)' },
+        fire:   { name:'火', glyph:'◆', color:'#fb7185', glow:'rgba(251,113,133,.28)' },
+        mist:   { name:'雾', glyph:'≋', color:'#67e8f9', glow:'rgba(103,232,249,.25)' },
+        mirror: { name:'镜', glyph:'◇', color:'#93c5fd', glow:'rgba(147,197,253,.28)' },
+        vine:   { name:'藤', glyph:'❧', color:'#6ee7b7', glow:'rgba(110,231,183,.25)' }
+      };
+      const ELEMENT_ORDER = Object.keys(ELEMENT_META);
+      const PROFILE_ELEMENT = {
+        sync:'star', talk:'mirror', soft:'vine', spark:'fire', steady:'moon', roam:'star', free:'mist', grow:'vine', ritual:'moon', repair:'mirror', playful:'fire', pragmatic:'mirror', together:'moon', parallel:'mist', intense:'fire', guarded:'mist', avoid:'mist', negotiate:'mirror', cozy:'vine', curious:'star', loyal:'moon', bold:'fire', balanced:'mirror', lowkey:'mist'
+      };
+      const PROFILE_ARCHETYPES = {
+        sync:['astral_guide','prism_weaver'], talk:['mirror_sage','mist_listener'], soft:['vine_keeper','moon_warden'], spark:['ember_path','lunar_forge'],
+        steady:['moon_warden','vine_keeper'], roam:['astral_guide','aurora_scribe'], free:['mist_listener','aurora_scribe'], grow:['wild_oracle','prism_weaver'],
+        ritual:['moon_warden','lunar_forge'], repair:['mirror_sage','vine_keeper'], playful:['ember_path','astral_guide'], pragmatic:['mirror_sage','moon_warden'],
+        together:['moon_warden','vine_keeper'], parallel:['mist_listener','prism_weaver'], intense:['ember_path','lunar_forge'], guarded:['mist_listener','mirror_sage'],
+        avoid:['mist_listener','moon_warden'], negotiate:['mirror_sage','wild_oracle'], cozy:['vine_keeper','moon_warden'], curious:['astral_guide','aurora_scribe'],
+        loyal:['moon_warden','vine_keeper'], bold:['ember_path','astral_guide'], balanced:['prism_weaver','mirror_sage'], lowkey:['mist_listener','moon_warden']
+      };
+      const o = (text, w) => ({ text, profile: w, scores: W[w] });
+      const QUESTIONS = [
+        { scene:'约会习惯', text:'难得空出一个周末，你们更像哪种组合？', options:[o('前一晚就把路线、餐厅和停车位安排明白','steady'),o('睡醒再说，走到哪儿算哪儿','roam'),o('各自懒半天，傍晚再一起吃顿好的','parallel'),o('突然买票去隔壁城市，把周末过成小逃亡','spark')]},
+        { scene:'消息回复', text:'一方半天没回消息，另一方通常会怎么想？', options:[o('大概在忙，忙完自然会出现','loyal'),o('发个可爱表情包，轻轻刷一下存在感','playful'),o('有点在意，会直接问“今天很忙吗？”','talk'),o('先把手机扣下，也去过自己的生活','free')]},
+        { scene:'吵架现场', text:'两个人声音都开始变大时，最常见的下一幕是？', options:[o('暂停十分钟，各自冷静后再谈','repair'),o('一边吵一边把陈年旧账也请上桌','intense'),o('有人先递水，气氛忽然破功','soft'),o('先分开做事，晚上再若无其事地靠近','avoid')]},
+        { scene:'消费观', text:'突然多出一笔小奖金，你们更可能怎么花？', options:[o('存进共同目标账户，数字上涨也很浪漫','pragmatic'),o('订一家一直舍不得吃的餐厅','ritual'),o('买两张机票，目的地先到机场再决定','roam'),o('各花各的，再互相展示战利品','free')]},
+        { scene:'旅行偏好', text:'旅行中迷路，而且手机只剩 8% 电，你们会？', options:[o('一个看地图，一个问路，迅速重新组队','sync'),o('既然错了就逛错的路，说不定更好玩','curious'),o('先找咖啡店充电，顺便把计划重排','steady'),o('互相吐槽三分钟，再笑着剪刀石头布','playful')]},
+        { scene:'边界感', text:'关于“恋爱后还要不要拥有自己的小世界”，你们更像？', options:[o('可以亲密，也要各自有一扇能关上的门','free'),o('好东西都想第一时间和对方共享','together'),o('不同阶段不同模式，忙时并行、闲时黏人','balanced'),o('大部分事一起做才有恋爱的实感','cozy')]},
+        { scene:'纪念日', text:'纪念日临近，你们的默认模式是？', options:[o('提前预订，仪式感要稳稳落地','ritual'),o('不追求日期精准，但会认真找时间补过','soft'),o('彼此都可能忘，想起来就临时加餐庆祝','playful'),o('不太过节，平常照顾好彼此更重要','pragmatic')]},
+        { scene:'家务分工', text:'面对水槽里突然“繁殖”的碗，你们通常？', options:[o('谁有空谁洗，另一位负责夸得很具体','cozy'),o('按固定分工，各自守住责任田','steady'),o('放歌一起洗，十分钟变成厨房派对','playful'),o('坦白今天都不想动，商量点外卖餐具','negotiate')]},
+        { scene:'社交模式', text:'朋友临时组局，只邀请了其中一方，另一方会？', options:[o('放心去玩，回来讲八卦就行','free'),o('问问能否带家属，能一起当然更热闹','together'),o('看当天状态，舒服最重要','balanced'),o('嘴上说没事，心里还是希望被优先选择','guarded')]},
+        { scene:'情绪反应', text:'一方明显低气压，却说“我没事”，另一方更常？', options:[o('抱一下，不追问，等对方自己开口','soft'),o('认真问三遍，直到“没事”变成真心话','talk'),o('端来吃的，再用日常陪伴慢慢解冻','cozy'),o('先留空间，稍后发一句“我随时在”','balanced')]},
+        { scene:'未来规划', text:'聊到三年后的生活，你们的画面是？', options:[o('会把城市、工作和预算聊到可执行','grow'),o('方向一致就好，具体的交给未来','loyal'),o('先列十种可能，再挑最让人兴奋的','curious'),o('各自先长成想要的样子，再决定交点','free')]},
+        { scene:'亲密表达', text:'你们最自然的“我爱你”翻译方式是？', options:[o('记住小习惯，把水果切好放在手边','cozy'),o('直接说出口，喜欢就要让对方听见','talk'),o('制造小惊喜，让普通日子闪一下','ritual'),o('尊重选择，需要时永远站在身后','loyal')]},
+        { scene:'独处需求', text:'其中一方说“今晚想一个人待着”，另一方会？', options:[o('完全理解，还会顺手点一份对方爱吃的','soft'),o('确认不是关系出了问题，然后各忙各的','talk'),o('略微失落，但也安排自己的快乐','free'),o('提议各坐沙发一头，安静地一起独处','parallel')]},
+        { scene:'信任感', text:'对方和前任偶尔有事务性联系，你们倾向？', options:[o('说清原因和边界，透明就不必紧张','negotiate'),o('相信对方能处理，不做实时审计','loyal'),o('会有醋意，但愿意坦白这种感觉','talk'),o('不喜欢过问，只观察行动是否一致','guarded')]},
+        { scene:'道歉方式', text:'一场小冲突后，你们最容易接受哪种和好方式？', options:[o('把哪里做错、下次怎么改说清楚','repair'),o('一句认真道歉，再来一个很久的拥抱','soft'),o('买回对方爱吃的，边吃边把台阶铺好','cozy'),o('发一张丑照求和，笑出来就翻篇','playful')]},
+        { scene:'惊喜仪式', text:'如果要给对方一个惊喜，你们更偏爱？', options:[o('精心策划但不声张，细节全部命中','ritual'),o('下班突然出现在楼下，手里拎着夜宵','spark'),o('送一个对方念叨很久的实用物件','pragmatic'),o('留出整天时间，让对方决定怎么玩','balanced')]},
+        { scene:'压力应对', text:'一方工作压力爆表时，这段关系会进入什么模式？', options:[o('另一方接管一部分生活琐事，静静托底','soft'),o('约定每天十分钟，把情绪说出来','talk'),o('先各自扛住，周末再集中回血','parallel'),o('拉出去运动或兜风，用新鲜空气换脑子','roam')]},
+        { scene:'生活习惯', text:'一个早睡一个夜猫子，你们会如何共存？', options:[o('制定“安静协议”，互不耽误也互道晚安','negotiate'),o('偶尔陪对方熬夜或早起，当作交换体验','curious'),o('各睡各的，第二天再交换昨夜新闻','free'),o('慢慢磨成相近作息，省得总错峰','together')]},
+        { scene:'朋友聚会', text:'在一群朋友面前，你们的相处画风是？', options:[o('各聊各的，偶尔隔空交换一个眼神','sync'),o('互相接梗，像双人脱口秀组合','playful'),o('自然照顾对方的座位、饮料和情绪','cozy'),o('不刻意绑定，结束后再单独复盘','parallel')]},
+        { scene:'工作忙碌', text:'连续两周都忙得见不到面，你们会？', options:[o('提前把短暂见面也排进日历','steady'),o('用语音和照片分享碎片，不让生活断线','talk'),o('彼此专心冲刺，忙完安排一次大放松','free'),o('哪怕只见十分钟，也要送个拥抱过去','spark')]},
+        { scene:'手机隐私', text:'关于彼此的手机密码，你们更接近？', options:[o('知道但不翻，密码只是生活便利','loyal'),o('各自保留，信任不靠检查证明','free'),o('偶尔借用很自然，没有特别规则','cozy'),o('愿意讨论边界，比“给不给看”更重要','negotiate')]},
+        { scene:'家庭关系', text:'第一次面对对方家人的不同习惯，你们会？', options:[o('提前交换情报，现场默契打配合','sync'),o('尊重但不勉强融入，关系慢慢建立','balanced'),o('一方负责社交，一方负责事后安抚','soft'),o('遇到不适会及时私下说，回家再复盘','talk')]},
+        { scene:'危机处理', text:'家里突然停水，晚饭还做到一半，你们的第一反应？', options:[o('迅速查原因、找水、调整菜单','pragmatic'),o('点外卖，再把停水夜变成地毯野餐','playful'),o('一个处理问题，一个安顿现场','sync'),o('干脆出门探索一家没吃过的小馆','roam')]},
+        { scene:'味觉分歧', text:'想吃的餐厅完全不同，你们通常怎么决定？', options:[o('轮流做主，今天你选下次我选','negotiate'),o('继续找，直到出现两个人都想吃的第五家','steady'),o('各点各的，坐在一起就算约会','free'),o('猜拳定输赢，输的人负责甜品','playful')]},
+        { scene:'迟到时刻', text:'一方约会迟到二十分钟，见面后的画面更像？', options:[o('解释清楚，道歉，然后正常开启约会','repair'),o('先摆三分钟脸色，再被一杯饮料哄好','intense'),o('顺路逛了会儿，见到人就忘了计时','soft'),o('会认真讨论以后如何避免彼此空等','grow')]},
+        { scene:'拍照习惯', text:'旅行时关于拍照，你们属于？', options:[o('拍到满意为止，照片是共同记忆工程','ritual'),o('随手记录真实瞬间，糊了也很好笑','playful'),o('一个爱拍一个不爱拍，但愿意互相配合','soft'),o('几乎不拍，眼睛记住比相册更重要','lowkey')]},
+        { scene:'礼物哲学', text:'收到“实用但不浪漫”的礼物时，你们会？', options:[o('越用越喜欢，实用本身就是被看见','pragmatic'),o('开心收下，也诚实表达下次想要点惊喜','talk'),o('当场编一段浪漫寓意，把气氛救回来','playful'),o('更看重送礼时对方有没有认真想到自己','loyal')]},
+        { scene:'共同爱好', text:'当你们喜欢的娱乐完全不重合，怎么办？', options:[o('各玩各的，结束后交换精彩片段','parallel'),o('轮流体验对方的快乐，哪怕只懂一点','curious'),o('再开发一个从零开始的共同爱好','grow'),o('待在同一空间做不同事，也很满足','cozy')]},
+        { scene:'公开表达', text:'在社交平台上，你们如何出现？', options:[o('偶尔发重要时刻，低调但不隐藏','balanced'),o('甜蜜日常值得营业，照片要配好文案','ritual'),o('很少公开，关系是两个人的私藏','lowkey'),o('随心情，搞笑互黑比秀恩爱更多','playful')]},
+        { scene:'吃醋瞬间', text:'一方被别人热情搭讪，另一方通常？', options:[o('走过来自然牵手，温柔宣示存在','spark'),o('事后笑着八卦：“那个人挺有眼光”','loyal'),o('会说自己有点酸，但不把醋变成审问','talk'),o('相信对方处理，自己继续做手头的事','free')]},
+        { scene:'身体不适', text:'一方感冒躺平时，另一方更像？', options:[o('药、水、温度计排成护理流水线','steady'),o('煮粥盖被子，嘴上还要念叨两句','cozy'),o('发来远程照护清单，每隔几小时确认','pragmatic'),o('陪看无脑综艺，让病号笑到咳嗽','playful')]},
+        { scene:'选择困难', text:'遇到影响两个人的大决定，你们会怎么拍板？', options:[o('把利弊摊开，各自表达后找共同底线','negotiate'),o('更擅长的人主导，另一方充分信任','sync'),o('小步试一试，边走边修正方向','grow'),o('凭直觉选让两个人都更兴奋的那个','bold')]},
+        { scene:'旧物回忆', text:'整理房间翻出过去关系的纪念品，你们会？', options:[o('坦然聊聊旧故事，过去不等于威胁','talk'),o('尊重彼此的历史，不主动追问细节','balanced'),o('有点介意，希望对方主动处理掉','guarded'),o('一起笑看从前的审美，然后继续收拾','playful')]},
+        { scene:'低谷时刻', text:'一方突然对自己失去信心，另一方通常怎么接住？', options:[o('先认同感受，不急着讲大道理','soft'),o('列出具体优点和证据，帮对方找回坐标','grow'),o('拉去吃顿好的，休息够了再重新出发','cozy'),o('陪着做一件小事，用行动打破停滞','repair')]},
+        { scene:'天气突变', text:'精心准备的户外约会被大雨打乱，你们会？', options:[o('立刻启用备用方案，惊喜不被天气取消','steady'),o('撑伞冲进雨里，狼狈也算限定剧情','bold'),o('回家窝着点外卖，松弛也是约会','cozy'),o('临时找博物馆或小店，继续探索','curious')]},
+        { scene:'观点分歧', text:'看完一部电影，两个人的评价完全相反，你们会？', options:[o('越聊越兴奋，分歧让夜晚变得更长','curious'),o('认真辩论，但不会把观点升级成人品','talk'),o('互相吐槽对方品味，然后抢同一桶爆米花','playful'),o('保留各自看法，不必每件事都达成一致','free')]},
+        { scene:'人生节奏', text:'一方想冲事业，一方更想享受当下，你们如何相处？', options:[o('把阶段目标说清，重新分配时间和期待','grow'),o('谁更忙谁少承担一点，关系动态调节','negotiate'),o('互不改造，支持彼此选择的生活速度','free'),o('寻找既能前进也能喘气的中间方案','balanced')]},
+        { scene:'远距离想象', text:'如果不得不异地半年，你们最可能采用？', options:[o('固定通话和见面计划，让等待有刻度','steady'),o('分享大量生活碎片，像把对方装进口袋','together'),o('专注各自成长，重要节点彼此出现','free'),o('策划轮流探访，把异地变成城市交换','roam')]},
+        { scene:'突然邀约', text:'晚上十点，朋友喊你们去看午夜场，你们会？', options:[o('换衣服就走，明天困也值得','bold'),o('看看明天安排，再做理性决定','pragmatic'),o('一个想去一个不想去，各自选择不勉强','parallel'),o('在家开投影，零食比影院还齐','cozy')]},
+        { scene:'日常告白', text:'最能代表你们关系的一句潜台词是？', options:[o('“你不用完美，我还是会站在这里。”','loyal'),o('“有话我们慢慢说，总能找到出口。”','repair'),o('“世界这么大，下一站一起去看看。”','roam'),o('“你做你的光，我做你的同行者。”','grow')]}
+      ];
+
+      const RESULTS = {
+        soul: { name:'灵魂同频型', quote:'“不是事事相同，而是总能听懂彼此没说完的半句。”', traits:'默契与沟通像一条双向小路，情绪和现实都能顺畅抵达。', reason:'你们既愿意靠近，也懂得把真实需要说清楚，相处少靠猜、多靠回应。', strength:'遇到变化时很容易重新对齐，越经历事情，越能形成专属的双人语言。', tip:'别让“太懂了”代替表达，偶尔仍要郑重说出感谢与喜欢。', egg:'你们大概率拥有一种别人看不懂、彼此一秒会意的暗号。' },
+        rivals: { name:'欢喜冤家型', quote:'“嘴上互不相让，转身却把最好的一口留给对方。”', traits:'热闹、机灵、有火花，关系里从不缺段子与戏剧性的转折。', reason:'浪漫与冒险让你们保持新鲜，摩擦也常常成为确认在乎的方式。', strength:'修复速度可能比想象中快，只要有人先笑，台阶就会自己出现。', tip:'玩笑可以救场，但重要感受仍值得一次不抖机灵的认真沟通。', egg:'你们的聊天记录如果做成表情包合集，可能够朋友用上一整年。' },
+        steady: { name:'细水长流型', quote:'“爱不是烟花常亮，而是每次回头，那盏灯都在。”', traits:'踏实、耐心、重视照顾，擅长把爱放进一餐一饭和明确承诺里。', reason:'稳定与包容构成了关系底盘，你们愿意一起处理生活真实的褶皱。', strength:'外部环境越复杂，越能看见彼此可靠，关系有很强的长期韧性。', tip:'稳定不等于一成不变，偶尔给日常加一点没有目的的小惊喜。', egg:'你们最甜的照片，可能不是精心摆拍，而是一起逛超市的背影。' },
+        growth: { name:'互补成长型', quote:'“你不是我的另一半，而是让我看见更多可能的同路人。”', traits:'尊重差异、保留自我，也愿意为共同未来更新彼此的相处方式。', reason:'独立给了空间，成长带来方向；你们不急着把对方变成自己。', strength:'面对人生转弯时更容易互相启发，关系会随着两个人一起升级。', tip:'成长目标之外，也要保留纯粹休息和无用快乐，别把恋爱开成项目会。', egg:'你们很可能互相安利过某个爱好，最后新手反而超过了老师。' },
+        adventure: { name:'冒险搭档型', quote:'“计划可以改，车票可以补，只要下一站还有彼此。”', traits:'好奇、行动力强，愿意一起走出熟悉地图，把未知变成共同记忆。', reason:'高冒险度让关系持续流动，你们从体验世界的方式里确认连接。', strength:'突发状况中反而容易激活默契，越是临时事件越能显出双人战力。', tip:'偶尔也为关系存一点确定性，冒险之后有个安心落脚点会更尽兴。', egg:'你们的“随便走走”，最后很可能以手机步数破纪录收场。' },
+        gentle: { name:'温柔守护型', quote:'“我不替你挡住所有风雨，但会记得在门口留一把伞。”', traits:'细腻、体贴、对情绪敏锐，表达爱时既有温度也有分寸。', reason:'包容与浪漫彼此加成，你们擅长看见需求，也愿意给回应一点仪式感。', strength:'关系拥有很好的情绪修复力，低谷里尤其能给对方安全感。', tip:'照顾者也需要被照顾，别让体贴变成不说需求的习惯。', egg:'你们可能记不清某次争执的原因，却记得和好时吃了什么。' },
+        independent: { name:'独立并肩型', quote:'“我们各自有旷野，也愿意在同一片夜色里亮灯。”', traits:'边界清晰、信任感强，不用时刻绑定也能感到彼此在场。', reason:'独立是你们的氧气；各自拥有完整生活，让每次分享都更有内容。', strength:'不容易被短暂忙碌消耗，关系能容纳事业、朋友与个人节奏。', tip:'别默认对方总能自我消化，稳定地表达想念，会让自由更有底气。', egg:'你们很适合“同屋不同乐”：一个追剧，一个看书，脚却碰在一起。' },
+        collision: { name:'热烈碰撞型', quote:'“爱像一场夏夜雷雨，来得响亮，也把世界洗得很新。”', traits:'感受浓、反应快、彼此吸引力强，关系里从不缺高浓度时刻。', reason:'浪漫与冒险提供强大引力，但沟通节奏偶尔追不上情绪速度。', strength:'真诚和行动力都很足，一旦学会停顿，冲突也能变成更深的了解。', tip:'情绪上头时先描述感受、再判断对错，给沟通留出半拍空间。', egg:'你们也许上一秒还在辩论，下一秒就因为同一只路过的小狗同时闭嘴。' }
+      };
+
+      /* 可替换人物素材清单：目前全部使用离线内联 SVG，后续可将 imageUrl 换成本地 data URI。 */
+      const PERSONA_ASSETS = {
+        astral: { imageUrl:'inline-svg://astral', halo:'star', silhouette:'cloak', ornament:'✦' },
+        lunar:  { imageUrl:'inline-svg://lunar',  halo:'crescent', silhouette:'mantle', ornament:'☾' },
+        ember:  { imageUrl:'inline-svg://ember',  halo:'flare', silhouette:'armor', ornament:'◆' },
+        mist:   { imageUrl:'inline-svg://mist',   halo:'rings', silhouette:'veil', ornament:'≋' },
+        mirror: { imageUrl:'inline-svg://mirror', halo:'prism', silhouette:'robe', ornament:'◇' },
+        vine:   { imageUrl:'inline-svg://vine',   halo:'leaves', silhouette:'cloak', ornament:'❧' },
+        aurora: { imageUrl:'inline-svg://aurora', halo:'star', silhouette:'veil', ornament:'✧' },
+        forge:  { imageUrl:'inline-svg://forge',  halo:'crescent', silhouette:'armor', ornament:'◈' },
+        prism:  { imageUrl:'inline-svg://prism',  halo:'prism', silhouette:'mantle', ornament:'⬡' },
+        forest: { imageUrl:'inline-svg://forest', halo:'leaves', silhouette:'robe', ornament:'♧' }
+      };
+      const ARCHETYPES = {
+        astral_guide: { id:'astral_guide', title:'星渊引路人', subtitle:'The Astral Guide', element:'star', assetKey:'astral', cardBackground:'linear-gradient(155deg,#1c1245,#080717 72%)', accentColor:'#fbbf24', verdictLines:['你们在未命名的夜色里辨认方向。','把分歧连成星座，是这段关系的天赋。','越接近未知，越能看见彼此的光。'], traits:['敏锐','好奇','方向感'], stats:{insight:88,empathy:68,action:75,creation:82,order:62}, referenceType:'清醒而浪漫的引导者' },
+        moon_warden: { id:'moon_warden', title:'月影守望者', subtitle:'The Lunar Warden', element:'moon', assetKey:'lunar', cardBackground:'linear-gradient(155deg,#251946,#090817 72%)', accentColor:'#c4b5fd', verdictLines:['你们替彼此守住柔软的夜晚。','安静陪伴，是比誓言更长的魔法。','月有圆缺，而归途始终亮着。'], traits:['安定','细腻','长情'], stats:{insight:72,empathy:91,action:58,creation:65,order:84}, referenceType:'温柔坚定的守望者' },
+        ember_path: { id:'ember_path', title:'赤焰破局者', subtitle:'The Ember Breaker', element:'fire', assetKey:'ember', cardBackground:'linear-gradient(155deg,#381329,#0c0713 72%)', accentColor:'#fb7185', verdictLines:['你们让沉默先于火焰融化。','行动与热望，是共同握住的火种。','每次碰撞，都可能照亮新的出口。'], traits:['热烈','果断','生命力'], stats:{insight:58,empathy:64,action:94,creation:82,order:48}, referenceType:'热烈直接的破局者' },
+        mist_listener: { id:'mist_listener', title:'雾语聆听者', subtitle:'The Mist Listener', element:'mist', assetKey:'mist', cardBackground:'linear-gradient(155deg,#103245,#080b18 72%)', accentColor:'#67e8f9', verdictLines:['你们听见情绪藏在雾里的回声。','留白与分寸，是关系的隐形结界。','不必时时相见，也能感知彼此。'], traits:['松弛','含蓄','边界感'], stats:{insight:84,empathy:79,action:48,creation:71,order:60}, referenceType:'安静通透的观察者' },
+        mirror_sage: { id:'mirror_sage', title:'镜境观心者', subtitle:'The Mirror Seer', element:'mirror', assetKey:'mirror', cardBackground:'linear-gradient(155deg,#122c4e,#090916 72%)', accentColor:'#93c5fd', verdictLines:['你们在彼此眼中校准真实的自己。','说清需要，是破除幻象的能力。','镜面不只映照，也为理解打开门。'], traits:['坦诚','洞察','善修复'], stats:{insight:94,empathy:78,action:59,creation:64,order:82}, referenceType:'冷静温柔的观心者' },
+        vine_keeper: { id:'vine_keeper', title:'青藤守护者', subtitle:'The Verdant Keeper', element:'vine', assetKey:'vine', cardBackground:'linear-gradient(155deg,#10362f,#080d16 72%)', accentColor:'#6ee7b7', verdictLines:['你们把爱种进一饭一蔬的日常。','耐心生根，照顾便有了枝叶。','时间不是考验，而是共同生长的土壤。'], traits:['包容','可靠','治愈力'], stats:{insight:70,empathy:93,action:62,creation:57,order:86}, referenceType:'温厚可靠的培育者' },
+        aurora_scribe: { id:'aurora_scribe', title:'极光记录者', subtitle:'The Aurora Scribe', element:'star', secondaryElement:'mist', assetKey:'aurora', cardBackground:'linear-gradient(155deg,#172750,#100925 72%)', accentColor:'#22d3ee', verdictLines:['你们把偶然写成只属于两人的传说。','好奇心展开地图，留白保存呼吸。','每段共同经历，都会化作新的极光。'], traits:['自由','灵感','故事感'], stats:{insight:80,empathy:66,action:72,creation:94,order:45}, referenceType:'自由敏锐的记录者' },
+        lunar_forge: { id:'lunar_forge', title:'月锻行者', subtitle:'The Moonforged Walker', element:'moon', secondaryElement:'fire', assetKey:'forge', cardBackground:'linear-gradient(155deg,#3b1939,#0d0919 72%)', accentColor:'#f0a4c7', verdictLines:['你们把温柔与锋芒锻成同一把钥匙。','热情负责启程，耐心负责抵达。','月光冷静，火焰诚实。'], traits:['韧性','浪漫','执行力'], stats:{insight:71,empathy:82,action:86,creation:76,order:69}, referenceType:'温柔有锋芒的行动者' },
+        prism_weaver: { id:'prism_weaver', title:'棱镜织梦者', subtitle:'The Prism Weaver', element:'mirror', secondaryElement:'star', assetKey:'prism', cardBackground:'linear-gradient(155deg,#26194f,#091329 72%)', accentColor:'#a78bfa', verdictLines:['你们让不同的光穿过同一枚棱镜。','理解差异，是共同创造的起点。','答案不止一种，而你们愿意一起寻找。'], traits:['兼容','创造','成长性'], stats:{insight:87,empathy:75,action:63,creation:91,order:70}, referenceType:'温柔理性的织梦者' },
+        wild_oracle: { id:'wild_oracle', title:'森月预言者', subtitle:'The Sylvan Oracle', element:'vine', secondaryElement:'moon', assetKey:'forest', cardBackground:'linear-gradient(155deg,#16382f,#11102b 72%)', accentColor:'#8be5bb', verdictLines:['你们从季节变化里读懂关系的节律。','彼此保留旷野，也共同照看花期。','慢慢生长的事，往往最接近永恒。'], traits:['成长','平衡','直觉'], stats:{insight:83,empathy:86,action:56,creation:74,order:77}, referenceType:'安静笃定的同行者' }
+      };
+      const RELATION_ARCHETYPE_BONUS = { soul:'prism_weaver', rivals:'ember_path', steady:'moon_warden', growth:'wild_oracle', adventure:'astral_guide', gentle:'vine_keeper', independent:'mist_listener', collision:'lunar_forge' };
+      const MIXED_TITLES = {
+        'star-moon':'星月引路人','star-fire':'星焰行者','star-mist':'极光逐梦者','star-mirror':'棱星观测者','star-vine':'星藤旅者',
+        'moon-star':'月穹引路人','moon-fire':'月焰行者','moon-mist':'雾月守望者','moon-mirror':'镜月观心者','moon-vine':'森月守望者',
+        'fire-star':'赤星破局者','fire-moon':'月锻行者','fire-mist':'雾焰游侠','fire-mirror':'镜焰裁决者','fire-vine':'藤火唤醒者',
+        'mist-star':'极光记录者','mist-moon':'雾月聆听者','mist-fire':'雾焰行者','mist-mirror':'雾镜引路人','mist-vine':'森雾漫游者',
+        'mirror-star':'棱镜织梦者','mirror-moon':'镜月观心者','mirror-fire':'镜焰破局者','mirror-mist':'雾镜引路人','mirror-vine':'青镜培育者',
+        'vine-star':'星藤守护者','vine-moon':'森月预言者','vine-fire':'藤焰唤醒者','vine-mist':'雾森聆听者','vine-mirror':'镜藤守护者'
+      };
+
+      const $ = id => document.getElementById(id);
+      const views = { home: $('homeView'), quiz: $('quizView'), result: $('resultView') };
+      const state = { index: 0, answers: [], locked: false, scores: null, total: 0, resultKey: '', personaResult: null, summonTimer: null };
+      let toastTimer = null;
+
+      function showView(name) {
+        Object.entries(views).forEach(([key, el]) => el.classList.toggle('active', key === name));
+        window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      }
+
+      function prepareOptionMappings() {
+        QUESTIONS.forEach((q, qi) => q.options.forEach((opt, oi) => {
+          opt.element = PROFILE_ELEMENT[opt.profile] || ELEMENT_ORDER[(qi + oi) % ELEMENT_ORDER.length];
+          opt.archetypes = (PROFILE_ARCHETYPES[opt.profile] || ['prism_weaver','astral_guide']).map((id, index) => ({ id, score:index === 0 ? 2 : 1 }));
+        }));
+      }
+
+      function initAtmosphere() {
+        const dust = $('cosmicDust');
+        if (!dust || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const tones = ['#8b5cf6','#22d3ee','#c4b5fd','#fbbf24'];
+        for (let i = 0; i < 22; i += 1) {
+          const mote = document.createElement('i');
+          mote.className = 'dust';
+          mote.style.cssText = `--size:${1 + (i % 3)}px;--x:${(i * 37 + 11) % 97}%;--y:${(i * 53 + 7) % 96}%;--tone:${tones[i % tones.length]};--alpha:${.16 + (i % 5) * .06};--duration:${7 + (i % 7)}s;--delay:${-i * .37}s;--dx:${(i % 2 ? 1 : -1) * (8 + i % 13)}px`;
+          dust.appendChild(mote);
+        }
+      }
+
+      function initRuneOrbit() {
+        const orbit = $('runeOrbit');
+        if (!orbit) return;
+        for (let i = 0; i < 8; i += 1) {
+          const dot = document.createElement('i');
+          dot.className = 'rune-dot';
+          dot.style.setProperty('--angle', `${i * 45}deg`);
+          orbit.appendChild(dot);
+        }
+      }
+
+      function renderQuestion() {
+        const q = QUESTIONS[state.index];
+        if (!q) return finishQuiz();
+        $('currentNumber').textContent = String(state.index + 1).padStart(2, '0');
+        $('runeCurrent').textContent = String(state.index + 1).padStart(2, '0');
+        $('progressLabel').textContent = `正在校准 · ${q.scene}`;
+        $('sceneTag').textContent = q.scene;
+        $('questionTitle').textContent = q.text;
+        const progress = ((state.index + 1) / QUESTIONS.length) * 100;
+        $('progressBar').style.width = `${progress}%`;
+        $('runeLit').style.strokeDashoffset = String(100 - progress);
+        document.querySelector('.rune-progress').setAttribute('aria-valuenow', state.index + 1);
+        document.querySelectorAll('.rune-dot').forEach((dot, i) => dot.classList.toggle('lit', state.index >= (i + 1) * 5));
+        document.querySelector('.progress-track').setAttribute('aria-valuenow', state.index + 1);
+        const box = $('options');
+        box.replaceChildren();
+        q.options.forEach((choice, i) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'option';
+          btn.setAttribute('role', 'radio');
+          btn.setAttribute('aria-checked', 'false');
+          const meta = ELEMENT_META[choice.element];
+          btn.dataset.element = choice.element;
+          btn.dataset.glyph = meta.glyph;
+          btn.style.setProperty('--element-color', meta.color);
+          btn.style.setProperty('--element-glow', meta.glow);
+          btn.innerHTML = `<span class="option-key">${String.fromCharCode(65 + i)}</span><span class="option-text"></span>`;
+          btn.querySelector('.option-text').textContent = choice.text;
+          btn.addEventListener('click', () => choose(i, btn), { once: true });
+          box.appendChild(btn);
+        });
+        $('questionPanel').className = 'question-panel in';
+        state.locked = false;
+      }
+
+      function choose(optionIndex, button) {
+        if (state.locked || !QUESTIONS[state.index]?.options[optionIndex]) return;
+        state.locked = true;
+        state.answers[state.index] = optionIndex;
+        button.classList.add('selected');
+        button.setAttribute('aria-checked', 'true');
+        const sweep = document.createElement('i');
+        sweep.className = 'light-sweep';
+        $('questionPanel').appendChild(sweep);
+        $('options').querySelectorAll('button').forEach(btn => btn.disabled = true);
+        setTimeout(() => {
+          $('questionPanel').className = 'question-panel out';
+          setTimeout(() => {
+            sweep.remove();
+            state.index += 1;
+            if (state.index >= QUESTIONS.length) finishQuiz(); else renderQuestion();
+          }, 190);
+        }, 220);
+      }
+
+      function calculateScores() {
+        const earned = Array(DIMENSIONS.length).fill(0);
+        const possible = Array(DIMENSIONS.length).fill(0);
+        QUESTIONS.forEach((q, qi) => {
+          const selected = q.options[state.answers[qi]] || q.options[0];
+          selected.scores.forEach((score, di) => earned[di] += Number(score) || 0);
+          DIMENSIONS.forEach((_, di) => possible[di] += Math.max(...q.options.map(opt => Number(opt.scores[di]) || 0)));
+        });
+        const normalized = earned.map((value, i) => Math.max(0, Math.min(100, Math.round(value / Math.max(1, possible[i]) * 100))));
+        return { dimensions: normalized, total: Math.max(0, Math.min(100, Math.round(normalized.reduce((a,b) => a + b, 0) / normalized.length))) };
+      }
+
+      function determineResult(d, total) {
+        const [sync, comm, tolerate, romance, stable, adventure, independent, growth] = d;
+        const max = Math.max(...d);
+        const high = i => d[i] >= 65;
+        const low = i => d[i] < 55;
+        if (total >= 72 && sync >= 68 && comm >= 68) return 'soul';
+        if (romance >= 65 && adventure >= 65 && comm < 55) return 'collision';
+        if (romance >= 62 && adventure >= 62 && (stable < 60 || comm < 60)) return 'rivals';
+        if (adventure === max && adventure >= 58) return 'adventure';
+        if (independent === max && independent >= 58) return 'independent';
+        if (independent >= 62 && growth >= 62) return 'growth';
+        if (tolerate >= 64 && romance >= 60) return 'gentle';
+        if (stable >= 62 && tolerate >= 62) return 'steady';
+        if (total >= 76) return comm >= sync ? 'soul' : 'steady';
+        if (high(7) && high(6)) return 'growth';
+        if (high(3) && low(1)) return 'collision';
+        if (max === adventure) return 'adventure';
+        if (max === independent) return 'independent';
+        if (max === tolerate) return romance >= 55 ? 'gentle' : 'steady';
+        if (max === stable) return 'steady';
+        if (romance + adventure > stable + comm) return comm < 55 ? 'rivals' : 'gentle';
+        return total >= 60 ? 'growth' : 'rivals';
+      }
+
+      function calculatePersonaResult() {
+        const archetypeScores = Object.fromEntries(Object.keys(ARCHETYPES).map(id => [id, 0]));
+        const elementScores = Object.fromEntries(ELEMENT_ORDER.map(id => [id, 0]));
+        QUESTIONS.forEach((q, qi) => {
+          const selected = q.options[state.answers[qi]] || q.options[0];
+          elementScores[selected.element] += 2;
+          selected.archetypes.forEach(({ id, score }) => { archetypeScores[id] = (archetypeScores[id] || 0) + score; });
+        });
+        const bonusId = RELATION_ARCHETYPE_BONUS[state.resultKey];
+        if (bonusId) archetypeScores[bonusId] += 5;
+        const [primaryId] = Object.entries(archetypeScores).sort((a,b) => b[1] - a[1])[0];
+        const archetype = ARCHETYPES[primaryId] || ARCHETYPES.prism_weaver;
+        elementScores[archetype.element] += 4;
+        if (archetype.secondaryElement) elementScores[archetype.secondaryElement] += 2;
+        const rankedElements = Object.entries(elementScores).sort((a,b) => b[1] - a[1]);
+        const primaryElement = archetype.element;
+        const secondaryCandidate = rankedElements.find(([id]) => id !== primaryElement);
+        const secondaryElement = secondaryCandidate && secondaryCandidate[1] >= rankedElements[0][1] * .48 ? secondaryCandidate[0] : archetype.secondaryElement;
+        const finalTitle = secondaryElement ? (MIXED_TITLES[`${primaryElement}-${secondaryElement}`] || archetype.title) : archetype.title;
+        const d = state.scores;
+        const measured = {
+          insight: Math.round((d[0] + d[1] + d[7]) / 3),
+          empathy: Math.round((d[2] + d[3] + d[0]) / 3),
+          action: Math.round((d[5] + d[4] + d[7]) / 3),
+          creation: Math.round((d[3] + d[5] + d[7]) / 3),
+          order: Math.round((d[4] + d[1] + d[2]) / 3)
+        };
+        const stats = Object.fromEntries(Object.keys(measured).map(key => [key, Math.max(0, Math.min(100, Math.round(archetype.stats[key] * .48 + measured[key] * .52))) ]));
+        const topDimensionIndex = d.indexOf(Math.max(...d));
+        const primaryName = ELEMENT_META[primaryElement].name;
+        const secondaryName = secondaryElement ? ELEMENT_META[secondaryElement].name : '';
+        const finalVerdict = [
+          archetype.verdictLines[0],
+          `${primaryName}赋予你们${archetype.traits[0]}的能力，${archetype.verdictLines[1]}`,
+          secondaryElement ? `主共鸣为「${primaryName}」，副特质「${secondaryName}」回应着你们最亮的${DIMENSIONS[topDimensionIndex]}。` : `「${primaryName}」是唯一而清晰的主共鸣，最亮的关系属性是${DIMENSIONS[topDimensionIndex]}。`
+        ];
+        const relation = RESULTS[state.resultKey] || RESULTS.growth;
+        return {
+          primaryArchetypeId:primaryId, secondaryElement, finalTitle, finalVerdict, stats,
+          shareText:`《测测你们的恋爱契合度》\n契合度 ${state.total}/100｜${relation.name}\n召唤人物：${finalTitle}\n主共鸣：${primaryName}${secondaryElement ? `｜副特质：${secondaryName}` : ''}\n${finalVerdict.join('\n')}`
+        };
+      }
+
+      function finishQuiz() {
+        if (state.answers.length !== QUESTIONS.length) return;
+        const result = calculateScores();
+        state.scores = result.dimensions;
+        state.total = result.total;
+        state.resultKey = determineResult(state.scores, state.total);
+        state.personaResult = calculatePersonaResult();
+        showView('result');
+        renderResult();
+      }
+
+      function portraitSvg(archetype, secondaryElement) {
+        const asset = PERSONA_ASSETS[archetype.assetKey];
+        const primary = ELEMENT_META[archetype.element];
+        const secondary = ELEMENT_META[secondaryElement || archetype.secondaryElement || archetype.element];
+        const shoulder = asset.silhouette === 'armor' ? 'M88 410 Q116 330 180 316 Q240 342 300 316 Q366 330 392 410Z' : asset.silhouette === 'veil' ? 'M72 430 Q104 300 178 310 Q240 352 302 310 Q380 300 408 430Z' : 'M80 430 Q112 326 182 310 Q240 340 298 310 Q368 326 400 430Z';
+        const crown = asset.halo === 'crescent' ? '<path d="M304 102a80 80 0 1 1-88-70 67 67 0 1 0 88 70Z" fill="none" stroke="url(#accent)" stroke-width="3" opacity=".7"/>' : asset.halo === 'prism' ? '<path d="M240 28 322 112 240 196 158 112Z" fill="none" stroke="url(#accent)" stroke-width="2" opacity=".55"/>' : '<path d="m240 26 10 45 37-27-20 41 46-3-43 18 38 26-46-10 12 45-28-37-27 38 7-46-44 15 35-31-43-15 47 0Z" fill="none" stroke="url(#accent)" stroke-width="2" opacity=".52"/>';
+        return `<svg class="portrait-svg" viewBox="0 0 480 520" role="img" aria-label="${archetype.title}原创人物剪影">
+          <defs><linearGradient id="accent" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${primary.color}"/><stop offset="1" stop-color="${secondary.color}"/></linearGradient><linearGradient id="robe" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#302657"/><stop offset="1" stop-color="#080713"/></linearGradient><radialGradient id="skin"><stop stop-color="#f5e8df"/><stop offset="1" stop-color="#947d91"/></radialGradient><filter id="soft"><feGaussianBlur stdDeviation="12"/></filter></defs>
+          <g opacity=".42" fill="${primary.color}"><circle cx="72" cy="120" r="2"/><circle cx="394" cy="164" r="3"/><circle cx="108" cy="258" r="2"/><circle cx="356" cy="278" r="1.5"/></g>
+          <circle cx="240" cy="160" r="130" fill="none" stroke="url(#accent)" stroke-dasharray="2 12" opacity=".35"/>${crown}
+          <ellipse cx="240" cy="455" rx="150" ry="34" fill="${primary.color}" opacity=".15" filter="url(#soft)"/>
+          <path d="${shoulder}" fill="url(#robe)" stroke="url(#accent)" stroke-width="2"/>
+          <path d="M187 190 Q185 112 240 104 Q300 112 294 194 L280 254 Q240 286 199 250Z" fill="#171126" stroke="url(#accent)" stroke-width="2"/>
+          <ellipse cx="240" cy="181" rx="48" ry="62" fill="url(#skin)"/>
+          <path d="M191 184 Q184 107 241 105 Q306 114 292 194 Q270 158 211 147 Q204 178 191 184Z" fill="#151023"/>
+          <path d="M204 218 Q240 245 276 218 Q266 269 240 278 Q214 268 204 218Z" fill="#120e20" opacity=".48"/>
+          <path d="M212 186 q12 8 24 0M247 186q12 8 23 0" fill="none" stroke="#352c45" stroke-width="3" stroke-linecap="round"/>
+          <path d="M231 211 Q240 217 250 211" fill="none" stroke="#745f70" stroke-width="2"/>
+          <circle cx="240" cy="323" r="21" fill="none" stroke="url(#accent)" stroke-width="2"/><text x="240" y="331" text-anchor="middle" fill="${primary.color}" font-size="23">${asset.ornament}</text>
+          <path d="M116 414 Q158 360 196 339 M364 414 Q322 360 284 339" fill="none" stroke="url(#accent)" opacity=".45"/>
+        </svg>`;
+      }
+
+      function polarPoint(cx, cy, radius, index, count = 5) {
+        const angle = -Math.PI / 2 + index * Math.PI * 2 / count;
+        return [cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius];
+      }
+
+      function radarSvg(stats) {
+        const labels = ['洞察','共情','行动','创造','秩序'];
+        const values = [stats.insight,stats.empathy,stats.action,stats.creation,stats.order];
+        const grids = [20,40,60,80,100].map(level => `<polygon class="radar-grid" points="${values.map((_,i)=>polarPoint(120,105,70*level/100,i).join(',')).join(' ')}"/>`).join('');
+        const axes = values.map((_,i)=>{const p=polarPoint(120,105,70,i);return `<line class="radar-axis" x1="120" y1="105" x2="${p[0]}" y2="${p[1]}"/>`;}).join('');
+        const shape = values.map((v,i)=>polarPoint(120,105,70*v/100,i).join(',')).join(' ');
+        const text = labels.map((label,i)=>{const p=polarPoint(120,105,92,i);return `<text class="radar-label" x="${p[0]}" y="${p[1]}" text-anchor="middle" dominant-baseline="middle">${label} ${values[i]}</text>`;}).join('');
+        return `<svg class="radar-svg" viewBox="0 0 240 220" role="img" aria-label="人物五维属性雷达图">${grids}${axes}<polygon class="radar-shape" points="${shape}"/>${text}</svg>`;
+      }
+
+      function renderResult() {
+        const persona = state.personaResult;
+        const archetype = ARCHETYPES[persona.primaryArchetypeId];
+        const relation = RESULTS[state.resultKey] || RESULTS.growth;
+        const primaryMeta = ELEMENT_META[archetype.element];
+        const secondaryMeta = persona.secondaryElement ? ELEMENT_META[persona.secondaryElement] : null;
+        clearTimeout(state.summonTimer);
+        $('summonStage').hidden = false;
+        $('resultWrap').hidden = true;
+        $('resultWrap').classList.remove('result-reveal');
+        $('personaCard').style.setProperty('--persona-accent', archetype.accentColor);
+        $('personaCard').style.setProperty('--persona-bg', archetype.cardBackground);
+        $('personaTitle').textContent = persona.finalTitle;
+        $('personaSubtitle').textContent = archetype.subtitle;
+        $('portraitMount').innerHTML = portraitSvg(archetype, persona.secondaryElement);
+        $('elementChips').innerHTML = `<span class="element-chip" style="--chip:${primaryMeta.color}">${primaryMeta.glyph} 主共鸣 · ${primaryMeta.name}</span>${secondaryMeta ? `<span class="element-chip" style="--chip:${secondaryMeta.color}">${secondaryMeta.glyph} 副特质 · ${secondaryMeta.name}</span>` : ''}`;
+        $('verdictList').replaceChildren(...persona.finalVerdict.map(line => { const li=document.createElement('li'); li.textContent=line; return li; }));
+        $('radarMount').innerHTML = radarSvg(persona.stats);
+        $('referenceType').textContent = archetype.referenceType;
+        $('traitList').replaceChildren(...archetype.traits.map(text => { const span=document.createElement('span'); span.className='trait'; span.textContent=text; return span; }));
+        $('relationEcho').innerHTML = `关系底色 <strong>${relation.name}</strong><br>${relation.quote}`;
+        $('cardIndex').textContent = `NO. ${String(Object.keys(ARCHETYPES).indexOf(archetype.id) + 1).padStart(2,'0')}`;
+        $('cardCode').textContent = `RESONANCE / ${String(state.total).padStart(3,'0')}`;
+        $('scoreNumber').textContent = '0';
+        const delay = matchMedia('(prefers-reduced-motion: reduce)').matches ? 80 : 1050;
+        state.summonTimer = setTimeout(() => {
+          $('summonStage').hidden = true;
+          $('resultWrap').hidden = false;
+          $('resultWrap').classList.add('result-reveal');
+          animateScore(state.total);
+        }, delay);
+      }
+
+      function animateScore(target) {
+        const el = $('scoreNumber');
+        const start = performance.now();
+        const duration = matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 760;
+        const tick = now => {
+          const p = Math.min(1, (now - start) / duration);
+          el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }
+
+      function resetQuiz() {
+        clearTimeout(state.summonTimer);
+        state.index = 0;
+        state.answers = [];
+        state.locked = false;
+        state.scores = null;
+        state.total = 0;
+        state.resultKey = '';
+        state.personaResult = null;
+        $('scoreNumber').textContent = '0';
+        renderQuestion();
+        showView('quiz');
+      }
+
+      function showToast(message) {
+        clearTimeout(toastTimer);
+        $('toast').textContent = message;
+        $('toast').classList.add('show');
+        toastTimer = setTimeout(() => $('toast').classList.remove('show'), 2600);
+      }
+
+      async function copyShare() {
+        const text = state.personaResult?.shareText || '《测测你们的恋爱契合度》';
+        try {
+          if (!navigator.clipboard?.writeText) throw new Error('clipboard unavailable');
+          await navigator.clipboard.writeText(text);
+          showToast('分享文案已复制，去晒出你们的答案吧');
+        } catch (_) {
+          const area = document.createElement('textarea');
+          area.value = text;
+          area.setAttribute('readonly', '');
+          area.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
+          document.body.appendChild(area);
+          area.select();
+          let copied = false;
+          try { copied = document.execCommand('copy'); } catch (e) { copied = false; }
+          area.remove();
+          showToast(copied ? '分享文案已复制' : '复制受限，请长按截图分享结果');
+        }
+      }
+
+      function roundedRect(ctx, x, y, w, h, r) {
+        const radius = Math.min(r, w / 2, h / 2);
+        ctx.beginPath(); ctx.moveTo(x + radius, y); ctx.arcTo(x + w, y, x + w, y + h, radius); ctx.arcTo(x + w, y + h, x, y + h, radius); ctx.arcTo(x, y + h, x, y, radius); ctx.arcTo(x, y, x + w, y, radius); ctx.closePath();
+      }
+
+      function canvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 9) {
+        let line = '', row = 0;
+        for (const char of text) {
+          const test = line + char;
+          if (ctx.measureText(test).width > maxWidth && line) {
+            ctx.fillText(line, x, y + row * lineHeight); line = char; row += 1;
+            if (row >= maxLines) return y + row * lineHeight;
+          } else line = test;
+        }
+        if (line && row < maxLines) { ctx.fillText(line, x, y + row * lineHeight); row += 1; }
+        return y + row * lineHeight;
+      }
+
+      function drawShareRadar(ctx, stats, cx, cy, radius, accent) {
+        const labels = ['洞察','共情','行动','创造','秩序'];
+        const values = [stats.insight,stats.empathy,stats.action,stats.creation,stats.order];
+        ctx.save();
+        for (let level = 1; level <= 5; level += 1) {
+          ctx.beginPath(); values.forEach((_,i) => { const p=polarPoint(cx,cy,radius*level/5,i); i ? ctx.lineTo(...p) : ctx.moveTo(...p); }); ctx.closePath(); ctx.strokeStyle='rgba(196,181,253,.18)'; ctx.lineWidth=2; ctx.stroke();
+        }
+        ctx.beginPath(); values.forEach((v,i)=>{const p=polarPoint(cx,cy,radius*v/100,i);i?ctx.lineTo(...p):ctx.moveTo(...p);}); ctx.closePath(); ctx.fillStyle=accent+'38'; ctx.strokeStyle=accent; ctx.lineWidth=4; ctx.fill(); ctx.stroke();
+        ctx.fillStyle='#c9c3d9'; ctx.font='24px -apple-system,"PingFang SC",sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+        labels.forEach((label,i)=>{const p=polarPoint(cx,cy,radius+42,i);ctx.fillText(`${label} ${values[i]}`,p[0],p[1]);});
+        ctx.restore();
+      }
+
+      function drawCanvasSilhouette(ctx, cx, top, accent, secondary) {
+        const glow = ctx.createRadialGradient(cx,top+250,20,cx,top+250,270); glow.addColorStop(0,accent+'4d');glow.addColorStop(1,'transparent');ctx.fillStyle=glow;ctx.fillRect(cx-320,top-30,640,620);
+        ctx.save(); ctx.translate(cx,top);
+        ctx.strokeStyle=secondary;ctx.lineWidth=3;ctx.globalAlpha=.55;ctx.beginPath();ctx.arc(0,180,205,0,Math.PI*2);ctx.stroke();ctx.setLineDash([5,18]);ctx.beginPath();ctx.arc(0,180,245,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+        const robe=ctx.createLinearGradient(0,190,0,600);robe.addColorStop(0,'#352957');robe.addColorStop(1,'#080611');ctx.fillStyle=robe;ctx.strokeStyle=accent;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-230,590);ctx.quadraticCurveTo(-170,350,-74,320);ctx.quadraticCurveTo(0,380,74,320);ctx.quadraticCurveTo(170,350,230,590);ctx.closePath();ctx.fill();ctx.stroke();
+        const skin=ctx.createRadialGradient(-18,210,8,0,230,92);skin.addColorStop(0,'#f5e8df');skin.addColorStop(1,'#9b8295');ctx.fillStyle=skin;ctx.beginPath();ctx.ellipse(0,215,76,96,0,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='#140e22';ctx.beginPath();ctx.moveTo(-78,222);ctx.quadraticCurveTo(-90,98,0,96);ctx.quadraticCurveTo(96,110,78,230);ctx.quadraticCurveTo(46,172,-55,160);ctx.quadraticCurveTo(-59,206,-78,222);ctx.fill();
+        ctx.strokeStyle='#44344f';ctx.lineWidth=4;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-44,218);ctx.quadraticCurveTo(-24,229,-6,217);ctx.moveTo(10,217);ctx.quadraticCurveTo(30,229,47,216);ctx.stroke();
+        ctx.strokeStyle=accent;ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,382,34,0,Math.PI*2);ctx.stroke();ctx.fillStyle=secondary;ctx.font='42px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('✦',0,386);ctx.restore();
+      }
+
+      async function savePersonaCard() {
+        const persona = state.personaResult;
+        if (!persona) return;
+        const archetype = ARCHETYPES[persona.primaryArchetypeId];
+        const primary = ELEMENT_META[archetype.element];
+        const secondary = ELEMENT_META[persona.secondaryElement || archetype.secondaryElement || archetype.element];
+        const canvas = document.createElement('canvas');
+        canvas.width = 1080; canvas.height = 1600;
+        const ctx = canvas.getContext('2d');
+        const bg = ctx.createLinearGradient(0,0,1080,1600);bg.addColorStop(0,'#1d123d');bg.addColorStop(.52,'#0d0920');bg.addColorStop(1,'#06040d');ctx.fillStyle=bg;ctx.fillRect(0,0,1080,1600);
+        const aura=ctx.createRadialGradient(540,360,20,540,360,620);aura.addColorStop(0,archetype.accentColor+'42');aura.addColorStop(1,'transparent');ctx.fillStyle=aura;ctx.fillRect(0,0,1080,980);
+        for(let i=0;i<40;i+=1){ctx.globalAlpha=.15+(i%5)*.05;ctx.fillStyle=i%3?archetype.accentColor:secondary.color;ctx.beginPath();ctx.arc((i*197)%1040+20,(i*263)%1460+20,1+i%2,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;
+        roundedRect(ctx,34,34,1012,1532,34);ctx.strokeStyle=archetype.accentColor+'88';ctx.lineWidth=3;ctx.stroke();roundedRect(ctx,54,54,972,1492,25);ctx.strokeStyle='rgba(255,255,255,.12)';ctx.stroke();
+        ctx.fillStyle='#b9b2cc';ctx.font='22px -apple-system,"PingFang SC",sans-serif';ctx.letterSpacing='4px';ctx.fillText('ARCANE RELATION ARCHIVE',88,108);ctx.textAlign='right';ctx.fillStyle='#fbbf24';ctx.fillText(`RESONANCE / ${String(state.total).padStart(3,'0')}`,992,108);ctx.textAlign='left';
+        drawCanvasSilhouette(ctx,540,100,archetype.accentColor,secondary.color);
+        const shade=ctx.createLinearGradient(0,620,0,920);shade.addColorStop(0,'transparent');shade.addColorStop(1,'#090615');ctx.fillStyle=shade;ctx.fillRect(55,570,970,360);
+        ctx.fillStyle=primary.color;ctx.font='28px -apple-system,"PingFang SC",sans-serif';ctx.fillText(`${primary.glyph} 主共鸣 · ${primary.name}${persona.secondaryElement ? `   ${secondary.glyph} 副特质 · ${secondary.name}` : ''}`,90,760);
+        ctx.fillStyle='#fff';ctx.font='500 80px "Songti SC","STSong",serif';ctx.fillText(persona.finalTitle,86,850);
+        ctx.fillStyle='#a9a3bd';ctx.font='24px -apple-system,"PingFang SC",sans-serif';ctx.fillText(archetype.subtitle.toUpperCase(),90,895);
+        ctx.strokeStyle='rgba(255,255,255,.1)';ctx.beginPath();ctx.moveTo(86,936);ctx.lineTo(994,936);ctx.stroke();
+        ctx.fillStyle='#e2ddec';ctx.font='31px "Songti SC","STSong",serif';let verdictY=986;persona.finalVerdict.forEach(line=>{ctx.fillStyle=archetype.accentColor;ctx.fillText('✦',88,verdictY);ctx.fillStyle='#e2ddec';verdictY=canvasText(ctx,line,128,verdictY,830,46,2)+12;});
+        drawShareRadar(ctx,persona.stats,300,1345,120,archetype.accentColor);
+        ctx.fillStyle='#22d3ee';ctx.font='22px -apple-system,"PingFang SC",sans-serif';ctx.fillText('气质参照',540,1240);ctx.fillStyle='#fff';ctx.font='42px "Songti SC","STSong",serif';canvasText(ctx,archetype.referenceType,540,1298,420,54,2);
+        ctx.fillStyle='#a9a3bd';ctx.font='23px -apple-system,"PingFang SC",sans-serif';ctx.fillText(archetype.traits.map(t=>`#${t}`).join('  '),540,1418);ctx.fillStyle='#756e86';ctx.font='18px -apple-system,"PingFang SC",sans-serif';ctx.fillText('原创人物原型 · 趣味测试 · 非专业心理诊断',540,1490);
+        canvas.toBlob(blob => {
+          if (!blob) return showToast('生成失败，请直接截图保存');
+          const url = URL.createObjectURL(blob); const link=document.createElement('a'); link.href=url; link.download=`恋爱契合度-${persona.finalTitle}.png`; document.body.appendChild(link); link.click(); link.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000); showToast('竖版人物卡已生成');
+        },'image/png',1);
+      }
+
+      function selfCheck() {
+        const errors = [];
+        if (QUESTIONS.length !== 40) errors.push(`题目数量为 ${QUESTIONS.length}`);
+        QUESTIONS.forEach((q, i) => {
+          if (q.options.length !== 4) errors.push(`第 ${i + 1} 题不是 4 个选项`);
+          q.options.forEach((opt, j) => {
+            if (!Array.isArray(opt.scores) || opt.scores.length !== 8 || opt.scores.some(v => !Number.isFinite(v) || v < 0 || v > 3)) errors.push(`第 ${i + 1} 题选项 ${j + 1} 权重异常`);
+            if (!ELEMENT_META[opt.element] || !Array.isArray(opt.archetypes)) errors.push(`第 ${i + 1} 题选项 ${j + 1} 原型映射异常`);
+          });
+        });
+        const cases = {
+          soul:[82,84,74,68,78,62,65,76], collision:[55,42,52,82,42,82,48,55], rivals:[58,56,54,78,48,76,48,54],
+          steady:[62,64,82,54,86,40,55,62], growth:[55,66,62,50,62,58,79,83],
+          gentle:[62,64,84,76,68,46,54,62], independent:[54,62,58,46,62,55,90,70], adventure:[55,58,55,55,65,88,62,66]
+        };
+        Object.entries(cases).forEach(([expected, values]) => {
+          const actual = determineResult(values, Math.round(values.reduce((a,b)=>a+b,0)/8));
+          if (actual !== expected) errors.push(`结果覆盖异常：${expected} → ${actual}`);
+        });
+        if (Object.keys(ARCHETYPES).length < 8 || Object.keys(ARCHETYPES).length > 12) errors.push('人物原型数量应为 8–12');
+        if (errors.length) console.error(`[自检未通过] ${errors.join(' | ')}`); else console.info('[自检通过] 40题×4选项、8维权重、8类关系结果与10个人物原型覆盖正常');
+      }
+
+      prepareOptionMappings();
+      initAtmosphere();
+      initRuneOrbit();
+      $('startBtn').addEventListener('click', resetQuiz);
+      $('restartBtn').addEventListener('click', resetQuiz);
+      $('copyBtn').addEventListener('click', copyShare);
+      $('saveBtn').addEventListener('click', savePersonaCard);
+      selfCheck();
+    })();
+  </script>
+</body>
+</html>
